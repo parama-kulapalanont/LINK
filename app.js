@@ -283,13 +283,37 @@
     </button>`;
   }
 
-  function getPreviewUrl(file) {
+  function getHtmlWorkerUrl(file, projectId) {
+    const fileKey = file && file.role === 'main'
+      ? 'main'
+      : String(file && file.id ? file.id : 'main');
+
+    return publicApiUrl + '/html'
+      + '?project=' + encodeURIComponent(projectId)
+      + '&file=' + encodeURIComponent(fileKey);
+  }
+
+  function getPreviewUrl(file, projectId) {
     if (!file) return '';
+
+    if (file.kind === 'html') {
+      return publicApiConfigured
+        ? getHtmlWorkerUrl(file, projectId)
+        : apiUrl + '?view=html'
+          + '&project=' + encodeURIComponent(projectId)
+          + '&file=' + encodeURIComponent(file.role === 'main' ? 'main' : file.id);
+    }
+
     return file.previewUrl || file.openUrl || file.driveUrl || '';
   }
 
-  function getOpenUrl(file) {
+  function getOpenUrl(file, projectId) {
     if (!file) return '#';
+
+    if (file.kind === 'html') {
+      return getPreviewUrl(file, projectId);
+    }
+
     return file.openUrl || file.driveUrl || file.previewUrl || '#';
   }
 
@@ -338,8 +362,8 @@
       dialog.querySelectorAll('[data-file]').forEach(button => button.classList.toggle('active', button.dataset.file === file.id));
       $('viewerFileInfo').innerHTML = fileIcon(file) + '<span><strong>' + escapeHtml(file.name) + '</strong><small>' + formatBytes(file.size) + '</small></span>';
       $('openSourceButton').classList.remove('hidden');
-      const previewUrl = getPreviewUrl(file);
-      const openUrl = getOpenUrl(file);
+      const previewUrl = getPreviewUrl(file, project.id);
+      const openUrl = getOpenUrl(file, project.id);
       $('openSourceButton').href = openUrl;
 
       const mobileExternalFirst = isMobileViewport()
