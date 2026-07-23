@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+  <meta name="googlebot" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+  <meta name="bingbot" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+  <meta name="referrer" content="no-referrer">
+  <title>ศูนย์รวมผลงาน</title>
+  <link rel="stylesheet" href="styles.css?v=6">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="./" aria-label="หน้าหลัก">
+        <span class="brand-mark">ศ</span>
+        <span><strong>ศูนย์รวมผลงาน</strong><small>SPU PSD Work Hub</small></span>
+      </a>
+
+      <nav class="side-nav" aria-label="เมนูหลัก">
+        <button class="nav-item active" data-view="portfolio" type="button"><span>▦</span> ผลงาน</button>
+        <button class="nav-item" data-view="timeline" type="button"><span>⌁</span> แผนผังระยะเวลา</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="current-data">
+          <span class="status-dot"></span>
+          <div><strong>ข้อมูลปัจจุบัน</strong><small id="lastUpdated">รอโหลดข้อมูล</small></div>
+        </div>
+        <a id="adminLink" class="admin-link" href="#" target="_blank" rel="noopener"><span>⚙</span> จัดการผลงาน</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <h1 id="pageTitle">ศูนย์รวมผลงาน</h1>
+        <button id="refreshButton" class="button ghost" type="button">↻ รีเฟรชข้อมูล</button>
+      </header>
+
+      <section id="setupNotice" class="setup-notice hidden">
+        <strong>ยังไม่ได้เชื่อม Public API</strong>
+        <span>ตรวจสอบค่า <code>publicApiUrl</code> ในไฟล์ <code>config.js</code></span>
+      </section>
+
+      <section id="portfolioView">
+        <section class="stats-grid" aria-label="สรุปข้อมูล">
+          <article class="stat-card"><span>งานทั้งหมด</span><strong id="statTotal">0</strong><small>หัวข้องาน</small></article>
+          <article class="stat-card"><span>กำลังดำเนินการ</span><strong id="statProgress">0</strong><small>อยู่ระหว่างทำ</small></article>
+          <article class="stat-card"><span>เสร็จสิ้น</span><strong id="statCompleted">0</strong><small>ปิดงานแล้ว</small></article>
+          <article class="stat-card"><span>พักงาน</span><strong id="statHold">0</strong><small>รอดำเนินการต่อ</small></article>
+        </section>
+
+        <section class="toolbar-card">
+          <label class="search-wrap"><span>⌕</span><input id="searchInput" type="search" placeholder="ค้นหาชื่องาน ผู้รับผิดชอบ หรือป้ายกำกับ"></label>
+          <select id="tagFilter" aria-label="ป้ายกำกับ"><option value="all">ทุกป้ายกำกับ</option></select>
+          <select id="statusFilter" aria-label="สถานะ">
+            <option value="all">ทุกสถานะ</option>
+            <option value="open">เริ่มต้น</option>
+            <option value="in_progress">กำลังดำเนินการ</option>
+            <option value="completed">เสร็จสิ้น</option>
+            <option value="on_hold">พักงาน</option>
+          </select>
+          <select id="sortSelect" aria-label="เรียงลำดับ">
+            <option value="newest">อัปเดตล่าสุดก่อน</option>
+            <option value="progress">ความคืบหน้าสูงสุด</option>
+            <option value="title">เรียงตามชื่อ</option>
+          </select>
+          <div class="layout-switch" aria-label="รูปแบบการแสดงผล">
+            <button id="cardViewButton" class="active" type="button" title="มุมมองการ์ด">▦</button>
+            <button id="listViewButton" type="button" title="มุมมองรายการ">☷</button>
+          </div>
+        </section>
+
+        <div class="section-header"><h2>ผลงานทั้งหมด</h2><span id="resultCount">0 รายการ</span></div>
+        <section id="projectGrid" class="project-grid"></section>
+        <section id="projectList" class="project-list hidden"></section>
+        <section id="emptyState" class="empty-state hidden"><strong>ไม่พบรายการ</strong><span>ลองเปลี่ยนคำค้นหาหรือตัวกรอง</span></section>
+      </section>
+
+      <section id="timelineView" class="hidden">
+        <section class="timeline-panel">
+          <div class="timeline-toolbar">
+            <div class="timeline-toolbar-left">
+              <div id="timelineScaleButtons" class="timeline-segmented" aria-label="ระดับเวลา">
+                <button class="active" type="button" data-scale="day">วัน</button>
+                <button type="button" data-scale="month">เดือน</button>
+                <button type="button" data-scale="year">ปี</button>
+              </div>
+              <button id="timelinePrevButton" class="button ghost" type="button">← ก่อนหน้า</button>
+              <button id="timelineTodayButton" class="button ghost" type="button">วันนี้</button>
+              <button id="timelineNextButton" class="button ghost" type="button">ถัดไป →</button>
+            </div>
+            <div id="timelinePeriodLabel" class="timeline-period"></div>
+            <div class="timeline-toolbar-right">
+              <select id="timelineStatusFilter" aria-label="กรองสถานะแผนระยะเวลา">
+                <option value="all">ทุกสถานะ</option>
+                <option value="open">เริ่มต้น</option>
+                <option value="in_progress">กำลังดำเนินการ</option>
+                <option value="completed">เสร็จสิ้น</option>
+                <option value="on_hold">พักงาน</option>
+              </select>
+              <span id="timelineCount" class="pill">0 งาน</span>
+            </div>
+          </div>
+          <div class="timeline-scroll">
+            <div id="timelineGrid" class="timeline-grid"></div>
+          </div>
+          <div class="timeline-legend">
+            <span><i class="timeline-dot"></i>เริ่มต้น / กำลังดำเนินการ</span>
+            <span><i class="timeline-dot completed"></i>เสร็จสิ้น</span>
+            <span><i class="timeline-dot on-hold"></i>พักงาน</span>
+            <span><i class="timeline-dot no-date"></i>ยังไม่กำหนดวัน</span>
+          </div>
+        </section>
+      </section>
+
+      <footer class="site-footer">SPU PSD Work Hub</footer>
+    </main>
+  </div>
+
+  <dialog id="projectDialog" class="project-dialog">
+    <button id="dialogClose" class="dialog-close" type="button" aria-label="ปิด">×</button>
+    <div id="dialogContent"></div>
+  </dialog>
+
+  <script src="config.js?v=4"></script>
+  <script src="app.js?v=6"></script>
+</body>
+</html>
